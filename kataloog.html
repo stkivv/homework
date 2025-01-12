@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kataloog</title>
+    <style>
+      body {
+        font-size: 18px;
+      }
+
+      hr {
+        border: 1px solid lightgray;
+        width: 100%;
+      }
+
+      #search-form,
+      #search-answer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 65%;
+        margin: auto;
+      }
+
+      @media (width <= 1250px) {
+        #search-form,
+        #search-answer {
+          width: 90%;
+        }
+      }
+
+      #search-answer {
+        margin-top: 20px;
+      }
+
+      .searchbar {
+        font-size: 18px;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 4px;
+      }
+
+      .search-btn {
+        background-color: #4387da;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        border: 0px solid transparent;
+        border-radius: 4px;
+        padding: 15px 25px;
+        width: fit-content;
+        margin-left: auto;
+      }
+
+      .search-btn:hover {
+        background-color: #6199dd;
+        cursor: pointer;
+      }
+
+      .filter-collapsible {
+        margin: 20px 0px 25px 0px;
+      }
+
+      .filter-header {
+        font-size: 26px;
+        display: flex;
+        user-select: none;
+      }
+
+      .filter-header:hover {
+        cursor: pointer;
+      }
+
+      .up-arrow,
+      .down-arrow {
+        font-weight: bold;
+        color: gray;
+        margin-left: auto;
+      }
+
+      .up-arrow {
+        transform: translateY(6px) scaleX(130%);
+      }
+
+      .down-arrow {
+        transform: translateY(-6px) scaleX(130%);
+      }
+
+      .filter-body {
+        margin-left: 20px;
+      }
+
+      .filter-body-main {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .multicheck {
+        text-decoration: underline;
+        color: #2b5385;
+        padding: 4px;
+        margin: 20px 5px 20px 0px;
+      }
+
+      .multicheck:hover {
+        cursor: pointer;
+      }
+
+      .filter-body-subheader {
+        font-size: 20px;
+        margin-top: 25px;
+      }
+
+      .filter-body-options {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-right: 50px;
+      }
+
+      .option {
+        margin-top: 10px;
+        margin-right: 20px;
+      }
+
+      .card {
+        margin-bottom: 30px;
+        background-color: rgb(245, 240, 232);
+        padding: 20px;
+        border-radius: 16px;
+      }
+
+      .card-contents {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 20px;
+      }
+
+      .card-contents-label {
+        grid-column: 1;
+      }
+
+      .card-contents-data {
+        grid-column: 2;
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="search-form" onsubmit="handleSearch(event)">
+      <input name="keyword" class="searchbar" placeholder="Märksõna..." />
+      <div id="filter-1" class="filter-collapsible">
+        <div
+          class="filter-header"
+          onclick="handleToggleFilterCollapsed('filter-1')"
+        >
+          <div>Meetmete filtrid</div>
+          <div class="down-arrow" style="display: block">⌄</div>
+          <div class="up-arrow" style="display: none">⌃</div>
+        </div>
+        <div class="filter-body" style="display: none">
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-1', true)"
+          >
+            vali kõik
+          </span>
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-1', false)"
+          >
+            lähtesta
+          </span>
+          <div class="filter-body-main">
+            <div class="filter-body-section">
+              <div class="filter-body-subheader">Turvameetme tase:</div>
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="pohimeede"
+                    value="Põhimeede"
+                    type="checkbox"
+                    id="pohimeede"
+                    checked
+                  />
+                  <label for="pohimeede">Põhimeede</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="standardmeede"
+                    value="Standardmeede"
+                    type="checkbox"
+                    id="standardmeede"
+                    checked
+                  />
+                  <label for="standardmeede">Standardmeede</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="korgmeede"
+                    value="Kõrgmeede"
+                    type="checkbox"
+                    id="korgmeede"
+                    checked
+                  />
+                  <label for="korgmeede">Kõrgmeede</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-body-section">
+              <div class="filter-body-subheader">Elutsükkel:</div>
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="kavandamine"
+                    value="Kavandamine"
+                    type="checkbox"
+                    id="kavandamine"
+                    checked
+                  />
+                  <label for="kavandamine">Kavandamine</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="evitus"
+                    value="Evitus"
+                    type="checkbox"
+                    id="evitus"
+                    checked
+                  />
+                  <label for="evitus">Evitus</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="kaitus"
+                    value="Käitus"
+                    type="checkbox"
+                    id="kaitus"
+                    checked
+                  />
+                  <label for="kaitus">Käitus</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="seire"
+                    value="Seire"
+                    type="checkbox"
+                    id="seire"
+                    checked
+                  />
+                  <label for="seire">Seire</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="parendamine"
+                    value="Parendamine"
+                    type="checkbox"
+                    id="parendamine"
+                    checked
+                  />
+                  <label for="parendamine">Parendamine</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="korvaldamine"
+                    value="Kõrvaldamine"
+                    type="checkbox"
+                    id="korvaldamine"
+                    checked
+                  />
+                  <label for="korvaldamine">Kõrvaldamine</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-body-section">
+              <div class="filter-body-subheader">&nbsp;</div>
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="c-meede"
+                    value="C"
+                    type="checkbox"
+                    id="c-meede"
+                    checked
+                  />
+                  <label for="c-meede">C</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="i-meede"
+                    value="I"
+                    type="checkbox"
+                    id="i-meede"
+                    checked
+                  />
+                  <label for="i-meede">I</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="a-meede"
+                    value="A"
+                    type="checkbox"
+                    id="a-meede"
+                    checked
+                  />
+                  <label for="a-meede">A</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div id="filter-2" class="filter-collapsible">
+        <div
+          class="filter-header"
+          onclick="handleToggleFilterCollapsed('filter-2')"
+        >
+          <div>Moodulite filtrid</div>
+          <div class="down-arrow" style="display: block">⌄</div>
+          <div class="up-arrow" style="display: none">⌃</div>
+        </div>
+        <div class="filter-body" style="display: none">
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-2', true)"
+          >
+            vali kõik
+          </span>
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-2', false)"
+          >
+            lähtesta
+          </span>
+          <div class="filter-body-main">
+            <div class="filter-body-section">
+              <div class="filter-body-subheader">Kategooria:</div>
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="susteemimoodulid"
+                    value="Süsteemimoodulid"
+                    type="checkbox"
+                    id="susteemimoodulid"
+                    checked
+                  />
+                  <label for="susteemimoodulid">Süsteemimoodulid</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="protsessimoodulid"
+                    value="Protsessimoodulid"
+                    type="checkbox"
+                    id="protsessimoodulid"
+                    checked
+                  />
+                  <label for="protsessimoodulid">Protsessimoodulid</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-body-section">
+              <div class="filter-body-subheader">Moodulid:</div>
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="isms"
+                    value="ISMS"
+                    type="checkbox"
+                    id="isms"
+                    checked
+                  />
+                  <label for="isms">ISMS</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="orp"
+                    value="ORP"
+                    type="checkbox"
+                    id="orp"
+                    checked
+                  />
+                  <label for="orp">ORP</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="con"
+                    value="CON"
+                    type="checkbox"
+                    id="con"
+                    checked
+                  />
+                  <label for="con">CON</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="ops"
+                    value="OPS"
+                    type="checkbox"
+                    id="ops"
+                    checked
+                  />
+                  <label for="ops">OPS</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="der"
+                    value="DER"
+                    type="checkbox"
+                    id="der"
+                    checked
+                  />
+                  <label for="der">DER</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="inf"
+                    value="INF"
+                    type="checkbox"
+                    id="inf"
+                    checked
+                  />
+                  <label for="inf">INF</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="net"
+                    value="NET"
+                    type="checkbox"
+                    id="net"
+                    checked
+                  />
+                  <label for="net">NET</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="sys"
+                    value="SYS"
+                    type="checkbox"
+                    id="sys"
+                    checked
+                  />
+                  <label for="sys">SYS</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="app"
+                    value="APP"
+                    type="checkbox"
+                    id="app"
+                    checked
+                  />
+                  <label for="app">APP</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="ind"
+                    value="IND"
+                    type="checkbox"
+                    id="ind"
+                    checked
+                  />
+                  <label for="ind">IND</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div id="filter-3" class="filter-collapsible">
+        <div
+          class="filter-header"
+          onclick="handleToggleFilterCollapsed('filter-3')"
+        >
+          <div>Vastuste filtrid</div>
+          <div class="down-arrow" style="display: block">⌄</div>
+          <div class="up-arrow" style="display: none">⌃</div>
+        </div>
+        <div class="filter-body" style="display: none">
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-3', true)"
+          >
+            vali kõik
+          </span>
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-3', false)"
+          >
+            lähtesta
+          </span>
+          <div class="filter-body-main">
+            <div class="filter-body-section">
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="moodulgrupid"
+                    value="Moodulgrupid"
+                    type="checkbox"
+                    id="moodulgrupid"
+                    checked
+                  />
+                  <label for="moodulgrupid">Moodulgrupid</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="moodulid"
+                    value="Moodulid"
+                    type="checkbox"
+                    id="moodulid"
+                    checked
+                  />
+                  <label for="moodulid">Moodulid</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="meetmed"
+                    value="Meetmed"
+                    class="Meetmed"
+                    type="checkbox"
+                    id="meetmed"
+                    checked
+                  />
+                  <label for="meetmed">Meetmed</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="moodulieesmargid"
+                    value="Mooduli eesmärgid"
+                    type="checkbox"
+                    id="moodulieesmargid"
+                    checked
+                  />
+                  <label for="moodulieesmargid">Mooduli eesmärgid</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="mooduliriskid"
+                    value="Mooduli riskid"
+                    type="checkbox"
+                    id="mooduliriskid"
+                    checked
+                  />
+                  <label for="mooduliriskid">Mooduli riskid</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="moodulipiirangud"
+                    value="Mooduli piirangud"
+                    type="checkbox"
+                    id="moodulipiirangud"
+                    checked
+                  />
+                  <label for="moodulipiirangud">Mooduli piirangud</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-body-section">
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="moodulivastutaja"
+                    value="Mooduli vastutaja"
+                    type="checkbox"
+                    id="moodulivastutaja"
+                    checked
+                  />
+                  <label for="moodulivastutaja">Mooduli vastutaja</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="meetmetekaasvastutaja"
+                    value="Meetmete kaasvastutaja"
+                    type="checkbox"
+                    id="meetmetekaasvastutaja"
+                    checked
+                  />
+                  <label for="meetmetekaasvastutaja"
+                    >Meetmete kaasvastutaja</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="meetmetealusohud"
+                    value="Meetmete alusohud"
+                    type="checkbox"
+                    id="meetmetealusohud"
+                    checked
+                  />
+                  <label for="meetmetealusohud">Meetmete alusohud</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="iso27001vastavus"
+                    value="ISO27001 vastavus"
+                    type="checkbox"
+                    id="iso27001vastavus"
+                    checked
+                  />
+                  <label for="iso27001vastavus">ISO27001 vastavus</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="profiilid"
+                    value="Profiilid"
+                    type="checkbox"
+                    id="profiilid"
+                    checked
+                  />
+                  <label for="profiilid">Profiilid</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div id="filter-4" class="filter-collapsible">
+        <div
+          class="filter-header"
+          onclick="handleToggleFilterCollapsed('filter-4')"
+        >
+          <div>Rollide filtrid</div>
+          <div class="down-arrow" style="display: block">⌄</div>
+          <div class="up-arrow" style="display: none">⌃</div>
+        </div>
+        <div class="filter-body" style="display: none">
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-4', true)"
+          >
+            vali kõik
+          </span>
+          <span
+            class="multicheck"
+            onclick="changeAllCheckboxes('filter-4', false)"
+          >
+            lähtesta
+          </span>
+          <div class="filter-body-main">
+            <div class="filter-body-section">
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="andmekaitsespetsialist"
+                    value="Andmekaitsespetsialist"
+                    type="checkbox"
+                    id="andmekaitsespetsialist"
+                    checked
+                  />
+                  <label for="andmekaitsespetsialist"
+                    >Andmekaitsespetsialist</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="arendaja"
+                    value="Arendaja"
+                    type="checkbox"
+                    id="arendaja"
+                    checked
+                  />
+                  <label for="arendaja">Arendaja</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="arhitekt"
+                    value="Arhitekt"
+                    type="checkbox"
+                    id="arhitekt"
+                    checked
+                  />
+                  <label for="arhitekt">Arhitekt</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="auditiruhm"
+                    value="Auditirühm"
+                    type="checkbox"
+                    id="auditiruhm"
+                    checked
+                  />
+                  <label for="auditiruhm">Auditirühm</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="avariiulem"
+                    value="Avariiülem"
+                    type="checkbox"
+                    id="avariiulem"
+                    checked
+                  />
+                  <label for="avariiulem">Avariiülem</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="haldusosakond"
+                    value="Haldusosakond"
+                    type="checkbox"
+                    id="haldusosakond"
+                    checked
+                  />
+                  <label for="haldusosakond">Haldusosakond</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="hankeosakond"
+                    value="Hankeosakond"
+                    type="checkbox"
+                    id="hankeosakond"
+                    checked
+                  />
+                  <label for="hankeosakond">Hankeosakond</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="hooldepersonal"
+                    value="Hooldepersonal"
+                    type="checkbox"
+                    id="hooldepersonal"
+                    checked
+                  />
+                  <label for="hooldepersonal">Hooldepersonal</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="infoturbelabivaatuseruhm"
+                    value="Infoturbe läbivaatuse rühm"
+                    type="checkbox"
+                    id="infoturbelabivaatuseruhm"
+                    checked
+                  />
+                  <label for="infoturbelabivaatuseruhm"
+                    >Infoturbe läbivaatuse rühm</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="infoturbejuht"
+                    value="Infoturbejuht"
+                    type="checkbox"
+                    id="infoturbejuht"
+                    checked
+                  />
+                  <label for="infoturbejuht">Infoturbejuht</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="ittalitus"
+                    value="IT-talitus"
+                    type="checkbox"
+                    id="ittalitus"
+                    checked
+                  />
+                  <label for="ittalitus">IT-talitus</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-body-section">
+              <div class="filter-body-options">
+                <div class="option">
+                  <input
+                    name="kasutaja"
+                    value="Kasutaja"
+                    type="checkbox"
+                    id="kasutaja"
+                    checked
+                  />
+                  <label for="kasutaja">Kasutaja</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="kaidutehnoloogiatalitus"
+                    value="Käidutehnoloogia talitus"
+                    type="checkbox"
+                    id="kaidutehnoloogiatalitus"
+                    checked
+                  />
+                  <label for="kaidutehnoloogiatalitus"
+                    >Käidutehnoloogia talitus</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="organisatisioonijuhtkond"
+                    value="Organisatsiooni juhtkond"
+                    type="checkbox"
+                    id="organisatsioonijuhtkond"
+                    checked
+                  />
+                  <label for="organisatsioonijuhtkond"
+                    >Organisatsiooni juhtkond</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="personaliosakond"
+                    value="Personaliosakond"
+                    type="checkbox"
+                    id="personaliosakond"
+                    checked
+                  />
+                  <label for="personaliosakond">Personaliosakond</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="tehnikatalitus"
+                    value="Tehnikatalitus"
+                    type="checkbox"
+                    id="tehnikatalitus"
+                    checked
+                  />
+                  <label for="tehnikatalitus">Tehnikatalitus</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="testija"
+                    value="Testija"
+                    type="checkbox"
+                    id="testija"
+                    checked
+                  />
+                  <label for="testija">Testija</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="tootaja"
+                    value="Töötaja"
+                    type="checkbox"
+                    id="tootaja"
+                    checked
+                  />
+                  <label for="tootaja">Töötaja</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="tuleohutusspetsialist"
+                    value="Tuleohutusspetsialist"
+                    type="checkbox"
+                    id="tuleohutusspetsialist"
+                    checked
+                  />
+                  <label for="tuleohutusspetsialist"
+                    >Tuleohutusspetsialist</label
+                  >
+                </div>
+                <div class="option">
+                  <input
+                    name="ulemus"
+                    value="Ülemus"
+                    type="checkbox"
+                    id="ulemus"
+                    checked
+                  />
+                  <label for="ulemus">Ülemus</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="vastavushaldur"
+                    value="Vastavushaldur"
+                    type="checkbox"
+                    id="vastavushaldur"
+                    checked
+                  />
+                  <label for="vastavushaldur">Vastavushaldur</label>
+                </div>
+                <div class="option">
+                  <input
+                    name="vastutavspetsialist"
+                    value="Vastutav spetsialist"
+                    type="checkbox"
+                    id="vastutavspetsialist"
+                    checked
+                  />
+                  <label for="vastutavspetsialist">Vastutav spetsialist</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <button type="submit" class="search-btn">Otsi kataloogist</button>
+    </form>
+    <div id="search-answer"></div>
+    <script>
+      const keyword = {
+        value: "",
+        set: (input) => {
+          // sanitize input
+          value = input.replaceAll(/(<([^>]+)>)/gi, "");
+          value = value.trim();
+          value = value.toLowerCase();
+        },
+        get: () => value,
+      };
+
+      // Hide/unhide filter content
+      const handleToggleFilterCollapsed = (elementId) => {
+        const collapsible = document.getElementById(elementId);
+
+        const header = collapsible.getElementsByClassName("filter-header")[0];
+        flipArrow(header);
+
+        const body = collapsible.getElementsByClassName("filter-body")[0];
+        body.style.display = body.style.display === "none" ? "block" : "none";
+      };
+
+      // flip the arrow on a collapsible element. Expects exactly one up and down arrow.
+      const flipArrow = (parentElement) => {
+        const upArrow = parentElement.getElementsByClassName("up-arrow")[0];
+        upArrow.style.display =
+          upArrow.style.display === "none" ? "block" : "none";
+
+        const downArrow = parentElement.getElementsByClassName("down-arrow")[0];
+        downArrow.style.display =
+          downArrow.style.display === "none" ? "block" : "none";
+      };
+
+      // extract data from form and execute search
+      const handleSearch = async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        // get form inputs
+        keyword.set(formData.get("keyword"));
+        const measureFilters = getMeasureFilters(formData);
+        const moduleFilters = getModuleFilters(formData);
+        const answerFilters = getAnswerFilters(formData);
+        const roleFilters = getRoleFilters(formData);
+
+        // fetch data and filter according to form inputs
+        const data = await fetch("./2024_eits_l3_250107.json")
+          .then((res) => res.json())
+          .then((data) => {
+            return applyKeywordFilter(data);
+          })
+          .then((data) => {
+            return applyMeasureFilters(data, measureFilters);
+          })
+          .then((data) => {
+            return applyModuleFilters(data, moduleFilters);
+          })
+          .then((data) => {
+            return applyRoleFilters(data, roleFilters);
+          })
+          .then((data) => {
+            // add properties from the profile json to result
+            return addExtraData(data);
+          })
+          .then((data) => {
+            return applyAnswerFilters(data, answerFilters);
+          })
+          // create DOM elements for the answer
+          .then((data) => {
+            createElements(data);
+            return data;
+          });
+      };
+
+      const applyKeywordFilter = (data) => {
+        return data.filter((item) => {
+          // check all fields in a JSON object
+          return Object.values(item).some((value) => {
+            // ignore field if not string
+            if (typeof value !== "string") return false;
+            return value.toLowerCase().includes(keyword.get());
+          });
+        });
+      };
+
+      const applyMeasureFilters = (data, measureFilters) => {
+        return data.filter(
+          (item) =>
+            measureFilters.lifeCycles.includes(item.lifecycle) &&
+            measureFilters.levels.includes(item.level) &&
+            // items with no cia value are included in the result
+            (!item.cia || measureFilters.cias.includes(item.cia))
+        );
+      };
+
+      const applyModuleFilters = (data, moduleFilters) => {
+        return (
+          data
+            // module filter
+            .filter((item) => {
+              return moduleFilters.modules.some((module) =>
+                item.pid.includes(module)
+              );
+            })
+            // category filter
+            .filter((item) => {
+              const modulegroup = item.pid.split(".")[0];
+              if (!moduleFilters.categories.includes("Süsteemimoodulid")) {
+                if (
+                  modulegroup === "APP" ||
+                  modulegroup === "SYS" ||
+                  modulegroup === "IND" ||
+                  modulegroup === "NET" ||
+                  modulegroup === "INF"
+                ) {
+                  return false;
+                }
+              }
+              if (!moduleFilters.categories.includes("Protsessimoodulid")) {
+                if (
+                  modulegroup === "ISMS" ||
+                  modulegroup === "ORP" ||
+                  modulegroup === "CON" ||
+                  modulegroup === "OPS" ||
+                  modulegroup === "DER"
+                ) {
+                  return false;
+                }
+              }
+              return true;
+            })
+        );
+      };
+
+      const applyRoleFilters = (data, roleFilters) => {
+        return data.filter((item) => {
+          return (
+            roleFilters.includes(item.responsible) ||
+            roleFilters.includes(item.assignee)
+          );
+        });
+      };
+
+      // adds missing properties from the profile json to data items
+      const addExtraData = async (data) => {
+        return await fetch("./profile_combo_250107.json")
+          .then((res) => res.json())
+          .then((profileData) => {
+            return data.map((item) => {
+              // extract module group
+              const modulegroup = item.pid.split(".")[0];
+
+              // attempt to find a profile match for each item in data
+              const match = profileData.find(
+                // measure codes are used for find (example: ISMS.1.M1)
+                (profile) => profile.measure === item.mid
+              );
+              if (match) {
+                // extract desired properties and add them to data
+                const { threats, iso } = match;
+                return { ...item, threats, iso, modulegroup };
+              }
+              // return item with just modulegroup if no match
+              return { ...item, modulegroup };
+            });
+          });
+      };
+
+      // set undesired answer types to null so they won't be included in the final answer
+      const applyAnswerFilters = (data, answerFilters) => {
+        return data.map((item) => {
+          // I am making the assumption that "Moodulgrupid" means ISMS and
+          // "Moodulid" means ISMS.1
+          if (!answerFilters.includes("Moodulgrupid")) {
+            item.modulegroup = null;
+          }
+          if (!answerFilters.includes("Moodulid")) {
+            item.pid = null;
+          }
+          if (!answerFilters.includes("Meetmed")) {
+            item.mid = null;
+          }
+          if (!answerFilters.includes("Mooduli riskid")) {
+            item.threats = null;
+          }
+          if (!answerFilters.includes("Meetmete alusohud")) {
+            item.cia = null;
+          }
+          if (!answerFilters.includes("Mooduli vastutaja")) {
+            item.responsible = null;
+          }
+          if (!answerFilters.includes("Meetmete kaasvastutaja")) {
+            item.assignee = null;
+          }
+          if (!answerFilters.includes("ISO27001 vastavus")) {
+            item.iso = null;
+          }
+          // NB! I have ignored some filters because I don't have enough context to work
+          // with them. I cannot figure out what properties these map to or what they're
+          // supposed to show.
+          // Ignored filters: "Mooduli eesmärgid", "Mooduli piirangud", "Profiilid"
+
+          return item;
+        });
+      };
+
+      const createElements = (data) => {
+        const parent = document.getElementById("search-answer");
+        parent.innerHTML = "";
+        data.map((item, index) => {
+          // create card for item
+          const card = document.createElement("div");
+          card.className = "card";
+          parent.appendChild(card);
+
+          // create header for card
+          let headerString = "";
+          headerString += "#" + (index + 1) + " ";
+          if (item.mid) {
+            headerString += item.mid;
+          } else if (item.pid) {
+            headerString += item.pid;
+          } else if (item.modulegroup) {
+            headerString += item.modulegroup;
+          }
+          const header = document.createElement("h3");
+          header.innerText += headerString;
+          card.appendChild(header);
+
+          // create title for card
+          const title = document.createElement("h2");
+          title.innerText += item.title;
+          card.appendChild(title);
+
+          // create grid for properties
+          const grid = document.createElement("div");
+          grid.className = "card-contents";
+          card.appendChild(grid);
+
+          // add content
+          const contentLabel = document.createElement("b");
+          contentLabel.className = "card-contents-label";
+          contentLabel.innerText += "Meetme sisu:";
+
+          const content = document.createElement("p");
+          content.className = "card-contents-data";
+          const contentString = makeKeywordBold(
+            item.content.replaceAll("[NL]", "<br />")
+          );
+          content.innerHTML += contentString;
+
+          grid.appendChild(contentLabel);
+          grid.appendChild(content);
+
+          // add responsible
+          if (item.responsible) {
+            const responsibleLabel = document.createElement("b");
+            responsibleLabel.className = "card-contents-label";
+            responsibleLabel.innerText += "Mooduli vastutaja:";
+
+            const responsible = document.createElement("p");
+            responsible.className = "card-contents-data";
+            responsible.innerHTML += makeKeywordBold(item.responsible);
+
+            grid.appendChild(responsibleLabel);
+            grid.appendChild(responsible);
+          }
+
+          // add assignee
+          if (item.assignee) {
+            const assigneeLabel = document.createElement("b");
+            assigneeLabel.className = "card-contents-label";
+            assigneeLabel.innerText += "Kaasvastutaja:";
+
+            const assignee = document.createElement("p");
+            assignee.className = "card-contents-data";
+            assignee.innerHTML += makeKeywordBold(item.assignee);
+
+            grid.appendChild(assigneeLabel);
+            grid.appendChild(assignee);
+          }
+
+          // add level
+          if (item.level) {
+            const levelLabel = document.createElement("b");
+            levelLabel.className = "card-contents-label";
+            levelLabel.innerText += "Meetme tase:";
+
+            const level = document.createElement("p");
+            level.className = "card-contents-data";
+            level.innerHTML += makeKeywordBold(item.level);
+
+            grid.appendChild(levelLabel);
+            grid.appendChild(level);
+          }
+
+          // add lifecycle
+          if (item.lifecycle) {
+            const lifecycleLabel = document.createElement("b");
+            lifecycleLabel.className = "card-contents-label";
+            lifecycleLabel.innerText += "Meetme elutsükkel:";
+
+            const lifecycle = document.createElement("p");
+            lifecycle.className = "card-contents-data";
+            lifecycle.innerHTML += makeKeywordBold(item.lifecycle);
+
+            grid.appendChild(lifecycleLabel);
+            grid.appendChild(lifecycle);
+          }
+
+          // add threats
+          if (item.threats) {
+            const threatLabel = document.createElement("b");
+            threatLabel.className = "card-contents-label";
+            threatLabel.innerText += "Mooduli riskid:";
+
+            const threats = document.createElement("p");
+            threats.className = "card-contents-data";
+            threats.innerHTML += makeKeywordBold(item.threats);
+
+            grid.appendChild(threatLabel);
+            grid.appendChild(threats);
+          }
+
+          // add iso27001
+          if (item.iso) {
+            const isoLabel = document.createElement("b");
+            isoLabel.className = "card-contents-label";
+            isoLabel.innerText += "ISO27001 vastavus:";
+
+            const iso = document.createElement("p");
+            iso.className = "card-contents-data";
+            iso.innerHTML += makeKeywordBold(item.iso);
+
+            grid.appendChild(isoLabel);
+            grid.appendChild(iso);
+          }
+
+          // add cia
+          if (item.cia) {
+            const ciaLabel = document.createElement("b");
+            ciaLabel.className = "card-contents-label";
+            ciaLabel.innerText += "Meetmete alusohud";
+
+            const cia = document.createElement("p");
+            cia.className = "card-contents-data";
+            cia.innerHTML += makeKeywordBold(item.cia);
+
+            grid.appendChild(ciaLabel);
+            grid.appendChild(cia);
+          }
+        });
+      };
+
+      const makeKeywordBold = (text) => {
+        if (!keyword.get()) return text;
+        // regex: keyword + /gi (all matches, case insensitive)
+        const reg = new RegExp(keyword.get(), "gi");
+        return text.replace(reg, (str) => str.bold());
+      };
+
+      const changeAllCheckboxes = (parentElementId, toChecked) => {
+        parent = document.getElementById(parentElementId);
+        parent
+          .querySelectorAll("input[type=checkbox]")
+          .forEach((el) => (el.checked = toChecked ? true : false));
+      };
+
+      const getMeasureFilters = (formData) => {
+        const levels = [
+          formData.get("pohimeede"),
+          formData.get("standardmeede"),
+          formData.get("korgmeede"),
+        ].filter((i) => i !== null);
+
+        const lifeCycles = [
+          formData.get("kavandamine"),
+          formData.get("evitus"),
+          formData.get("kaitus"),
+          formData.get("seire"),
+          formData.get("parendamine"),
+          formData.get("korvaldamine"),
+        ].filter((i) => i !== null);
+
+        const cias = [
+          formData.get("c-meede"),
+          formData.get("i-meede"),
+          formData.get("a-meede"),
+        ].filter((i) => i !== null);
+
+        return { levels, lifeCycles, cias };
+      };
+
+      const getModuleFilters = (formData) => {
+        const categories = [
+          formData.get("susteemimoodulid"),
+          formData.get("protsessimoodulid"),
+        ].filter((i) => i !== null);
+
+        const modules = [
+          formData.get("isms"),
+          formData.get("orp"),
+          formData.get("con"),
+          formData.get("ops"),
+          formData.get("der"),
+          formData.get("inf"),
+          formData.get("net"),
+          formData.get("sys"),
+          formData.get("app"),
+          formData.get("ind"),
+        ].filter((i) => i !== null);
+
+        return { categories, modules };
+      };
+
+      const getAnswerFilters = (formData) => {
+        return [
+          formData.get("moodulgrupid"),
+          formData.get("moodulid"),
+          formData.get("meetmed"),
+          formData.get("moodulieesmargid"),
+          formData.get("mooduliriskid"),
+          formData.get("moodulipiirangud"),
+          formData.get("moodulivastutaja"),
+          formData.get("meetmetekaasvastutaja"),
+          formData.get("meetmetealusohud"),
+          formData.get("iso27001vastavus"),
+          formData.get("profiilid"),
+        ].filter((i) => i !== null);
+      };
+
+      const getRoleFilters = (formData) => {
+        return [
+          formData.get("andmekaitsespetsialist"),
+          formData.get("arendaja"),
+          formData.get("arhitekt"),
+          formData.get("auditiruhm"),
+          formData.get("avariiulem"),
+          formData.get("haldusosakond"),
+          formData.get("hankeosakond"),
+          formData.get("hooldepersonal"),
+          formData.get("infoturbelabivaatuseruhm"),
+          formData.get("infoturbejuht"),
+          formData.get("ittalitus"),
+          formData.get("kasutaja"),
+          formData.get("kaidutehnoloogiatalitus"),
+          formData.get("organisatisioonijuhtkond"),
+          formData.get("personaliosakond"),
+          formData.get("tehnikatalitus"),
+          formData.get("testija"),
+          formData.get("tootaja"),
+          formData.get("tuleohutusspetsialist"),
+          formData.get("ulemus"),
+          formData.get("vastavushaldur"),
+          formData.get("vastutavspetsialist"),
+        ].filter((i) => i !== null);
+      };
+    </script>
+  </body>
+</html>
